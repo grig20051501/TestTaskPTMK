@@ -15,5 +15,5 @@ public:
 	void printInfo();
 	int getAge();
 	Employee(string name, string date, string sex);
-	bool insert(sqlite3* db, char* errMsg);
+	bool insert(sqlite3* db);
 };
