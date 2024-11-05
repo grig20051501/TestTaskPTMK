@@ -1,18 +1,19 @@
 #pragma once
 
 #include <string>
+#include <sqlite3.h>
 
 using namespace std;
 
 class Employee
 {
-private:
+public:
 	string name;
 	string birthDate;
-	bool isMale;
+	string sex;
 
-public:
 	void printInfo();
 	int getAge();
-	Employee(string name, string date, bool isMale);
+	Employee(string name, string date, string sex);
+	bool insert(sqlite3* db, char* errMsg);
 };

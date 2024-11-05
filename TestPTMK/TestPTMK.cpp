@@ -4,20 +4,34 @@
 
 using namespace std;
 
+static bool createTable(sqlite3* db, char* errMsg) {
+	int rc;
+	char sql1[] = "CREATE TABLE Employees(id INTEGER PRIMARY KEY AUTOINCREMENT,"
+		"name TEXT, birthDate TEXT, sex TEXT);";
+
+	rc = sqlite3_exec(db, sql1, 0, 0, &errMsg);
+	if (rc != SQLITE_OK) {
+		cout << "SQL ERROR: " << &errMsg << endl;
+		sqlite3_free(errMsg);
+		sqlite3_close(db);
+		return 1;
+	}
+
+	return 0;
+}
+
 int main() {
-	sqlite3* DB;
-	bool ex = false;
-	sqlite3_open("DataBase.db", &DB);
+	sqlite3* db;
+	char *errMsg = 0;
+	bool rc = sqlite3_open("DataBase.db", &db);
 
-	if (ex) { cout << "Error"; }
-	else { cout << "Succesfull"; }
-	Employee a1("grisha", "2005-01-15", true);
-	cout << "Hello" << endl;
+	if (rc != SQLITE_OK) {
+		sqlite3_close(db);
+		return 1;
+	}
 
-	a1.printInfo();
-	cout << a1.getAge();
-
-	sqlite3_close(DB);
+	createTable(db, errMsg);	
+	sqlite3_close(db);
 
 	return 0;
 }

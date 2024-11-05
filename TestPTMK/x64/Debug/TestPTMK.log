@@ -1,2 +1,2 @@
-﻿LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+﻿  TestPTMK.cpp
   TestPTMK.vcxproj -> C:\Users\Scuritel\Desktop\TestPTMK\x64\Debug\TestPTMK.exe

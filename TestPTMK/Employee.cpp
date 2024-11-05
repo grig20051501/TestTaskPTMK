@@ -1,22 +1,39 @@
 #include "Employee.h"
 #include <iostream>
+#include <sqlite3.h>
 #include <string>
 
 using namespace std;
 
-Employee::Employee(string name, string date, bool isMale) {
+Employee::Employee(string name, string date, string sex) {
 	this->name = name;
 	this->birthDate = date;
-	this->isMale = isMale;
+	this->sex = sex == "male" ? "male" : "female";
 }
 
 void Employee::printInfo() {
 	cout << "Name: " << this->name;
 	cout << " bithDate: " << this->birthDate;
-	string sex = this->isMale ? "male" : "female";
-	cout << " sex: " << sex << endl;
+	cout << " sex: " << this->sex << endl;
 }
 
 int Employee::getAge() {
 	return 2024 - stoi(this->birthDate.substr(0, 4));
+}
+
+bool Employee::insert(sqlite3* db, char* errMsg) {
+	string sql = "INSERT INTO Employees (name, birthDate, sex) VALUES"
+				"('" + this->name +
+				"', '" + this->birthDate +
+				"', '" + this->sex + "')";
+	
+	int rc = sqlite3_exec(db, sql.c_str(), 0, 0, &errMsg);
+	if (rc != SQLITE_OK) {
+		cout << "SQL ERROR: " << errMsg << endl;
+		sqlite3_free(errMsg);
+		sqlite3_close(db);
+		return 1;
+	}
+
+	return 0;
 }
