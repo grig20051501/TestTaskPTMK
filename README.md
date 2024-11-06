@@ -30,7 +30,7 @@
 
 ## Запуск приложения
 
-TestPTMK <mode> [parameters]
+TestPTMK [mode] [parameters]
 
 Пример запуска во втором режиме (добавление сотрудника):
 
