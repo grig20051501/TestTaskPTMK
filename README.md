@@ -31,11 +31,11 @@
 ## Запуск приложения
 
 ```bash
-TestPTMK [mode] [parameters]
+TestPTMK.exe [mode] [parameters]
 ```
 Пример запуска во втором режиме (добавление сотрудника):
 ```bash
-TestPTMK 2 "Ivanov Petr Sergeevich" 1985-12-15 male
+TestPTMK.exe 2 "Ivanov Petr Sergeevich" "1985-12-15" "male"
 ```
 ### Сборка
 
