@@ -17,5 +17,6 @@ public:
 	int getAge();
 	Employee(string name, string date, string sex);
 	void insert(sqlite3* db);
-	/*bool isUnique(vector<Employee> employees);*/
+	void insertMultiple(sqlite3* db, vector<Employee> employees);
+	vector<Employee> generateEmployees(size_t count, bool specialCase = false);
 };

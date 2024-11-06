@@ -2,6 +2,7 @@
 #include <sqlite3.h>
 #include "Employee.h"
 #include <vector>
+#include <random>
 
 using namespace std;
 
@@ -54,6 +55,7 @@ vector<Employee> readAllEmployees(sqlite3* db) {
 
 int main() {
 	sqlite3* db;
+	Employee a1("Smt", "2000-01-14", "male");
 	
 	bool rc = sqlite3_open("DataBase.db", &db);
 
@@ -61,22 +63,16 @@ int main() {
 		sqlite3_close(db);
 		return 1;
 	}
-
-	//createTable(db);
-	/*Employee a1("AAAA", "2005-15-01", "male");
-    Employee a2("BBBB", "2006-15-01", "male");
-    Employee a3("CCCC", "2007-15-01", "female");
-    Employee a4("DDDD", "2008-15-01", "female");
-	a1.insert(db);
-    a2.insert(db);
-    a3.insert(db);
-    a4.insert(db);*/
-	
+	vector<Employee> employessGenerated = a1.generateEmployees(990000);
+	vector<Employee> speciaEmployees = a1.generateEmployees(100, true);
 	vector<Employee> employees = readAllEmployees(db);
 
-	for (auto employee : employees) {
+	a1.insertMultiple(db, employessGenerated);
+	a1.insertMultiple(db, speciaEmployees);
+
+	/*for (auto employee : employees) {
 		employee.printInfo();
-	}
+	}*/
 
 	sqlite3_close(db);
 
