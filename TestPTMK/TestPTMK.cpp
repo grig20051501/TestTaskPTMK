@@ -2,6 +2,7 @@
 #include <sqlite3.h>
 #include "Employee.h"
 #include <vector>
+#include <chrono>
 
 using namespace std;
 
@@ -83,11 +84,15 @@ int main(int argc, char* argv[]) {
 	}
 	case 5:
 	{
+		auto start = chrono::high_resolution_clock::now();
 		string sql = "SELECT name, birthDate, sex FROM Employees WHERE sex = 'male' AND name LIKE 'F%';";
 		vector<Employee> employees = handler.pick(db, sql);
 		for (auto emp : employees) {
 			emp.printInfo();
 		}
+		auto end = chrono::high_resolution_clock::now();
+		chrono::duration<double> duration = end - start;
+		cout << "execution time: " << duration.count() << "seconds" << endl;
 		break;
 	}
 	default:
