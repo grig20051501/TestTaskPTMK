@@ -2,6 +2,7 @@
 
 #include <string>
 #include <sqlite3.h>
+#include <vector>
 
 using namespace std;
 
@@ -15,5 +16,6 @@ public:
 	void printInfo();
 	int getAge();
 	Employee(string name, string date, string sex);
-	bool insert(sqlite3* db);
+	void insert(sqlite3* db);
+	/*bool isUnique(vector<Employee> employees);*/
 };
