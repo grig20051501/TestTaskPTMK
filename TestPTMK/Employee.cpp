@@ -72,11 +72,12 @@ vector<Employee> Employee::generateEmployees(size_t count, bool specialCase) {
 	uniform_int_distribution<> yearDist(1970, 2000);
 
 	for (size_t i = 0; i < count; ++i) {
-		if (!specialCase) {
-			string sex = (genderDist(gen) == 0) ? "male" : "female";
+		string sex;
+		if ((genderDist(gen) || specialCase)) {
+			sex = "male";
 		}
 		else {
-			string sex = "male";
+			sex = "female";
 		}
 		char firstLetter = 'A' + letterDist(gen);
 		string lastName = (specialCase) ? "F" + string(1, 'A' + letterDist(gen)) + "lastname" : string(1, firstLetter) + "lastname";

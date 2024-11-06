@@ -2,18 +2,6 @@
 #include <sqlite3.h>
 #include "Employee.h"
 #include <vector>
-#include <random>
-
-//R"(
-//        SELECT e.name, e.birthDate, e.sex
-//        FROM Employees e
-//        GROUP BY e.name, e.birthDate
-//        ORDER BY e.name;
-//    )"
-
-//"SELECT*"
-//"FROM Employees"
-//"WHERE gender = 'Male' AND name LIKE 'F%';"
 
 using namespace std;
 
@@ -32,28 +20,79 @@ static void createTable(sqlite3* db) {
 	}
 }
 
-int main() {
-	sqlite3* db;
-	string sql = "SELECT name, birthDate, sex FROM Employees WHERE sex = 'male' AND name LIKE 'F%';";
+int main(int argc, char* argv[]) {
+	
+	if (argc < 2) {
+		cerr << "Usage: TestPTMK <mode> [parameters]" << endl;
+		return 1;
+	}
 
-	Employee a1("Smt", "2000-01-14", "male");
+	int mode = stoi(argv[1]);
+	sqlite3* db;
+	Employee handler("Smt", "2000-01-14", "male");
 	
 	bool rc = sqlite3_open("DataBase.db", &db);
 
 	if (rc != SQLITE_OK) {
 		sqlite3_close(db);
+		cerr << "Unable to open database:" << sqlite3_errmsg(db) << endl;
 		return 1;
 	}
 
-	/*vector<Employee> employessGenerated = a1.generateEmployees(990000);
-	vector<Employee> speciaEmployees = a1.generateEmployees(100, true);*/
-	vector<Employee> employees = a1.pick(db, sql);
-	for (auto i : employees) {
-		i.printInfo();
+	switch (mode) {
+	case 1:
+		createTable(db);
+		break;
+	case 2:
+		if (argc < 5) {
+			cerr << "Usage for mode 2: TestPTMK 2 <name> <birthDate> <sex>" << endl;
+			return 1;
+		}
+		{
+			string name = argv[2];
+			string birthDate = argv[3];
+			string sex = argv[4];
+			Employee temp(name, birthDate, sex);
+			temp.insert(db);
+			cout << "Succesful" << endl;
+		}
+		break;
+	case 3:
+	{
+		vector<Employee> employees;
+		string sql = R"(
+        SELECT e.name, e.birthDate, e.sex
+        FROM Employees e
+        GROUP BY e.name, e.birthDate
+        ORDER BY e.name;
+    )";
+		employees = handler.pick(db, sql);
+		for (auto emp : employees) {
+			emp.printInfo();
+		}
+		break;
 	}
-
-	/*a1.insertMultiple(db, employessGenerated);
-	a1.insertMultiple(db, speciaEmployees);*/
+	case 4:
+	{
+		vector<Employee> generatedEmployees = handler.generateEmployees(999900, false);
+		vector<Employee> specialEmloyees = handler.generateEmployees(100, true);
+		handler.insertMultiple(db, generatedEmployees);
+		handler.insertMultiple(db, specialEmloyees);
+		cout << "Succesful" << endl;
+		break;
+	}
+	case 5:
+	{
+		string sql = "SELECT name, birthDate, sex FROM Employees WHERE sex = 'male' AND name LIKE 'F%';";
+		vector<Employee> employees = handler.pick(db, sql);
+		for (auto emp : employees) {
+			emp.printInfo();
+		}
+		break;
+	}
+	default:
+		cerr << "Invalid mode or parameters" << endl;
+	}
 
 	sqlite3_close(db);
 
