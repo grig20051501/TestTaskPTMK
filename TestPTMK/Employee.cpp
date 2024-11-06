@@ -4,7 +4,6 @@
 #include <sqlite3.h>
 #include <random>
 #include <string>
-#include <ctime>
 #include <vector>
 
 using namespace std;
@@ -73,7 +72,12 @@ vector<Employee> Employee::generateEmployees(size_t count, bool specialCase) {
 	uniform_int_distribution<> yearDist(1970, 2000);
 
 	for (size_t i = 0; i < count; ++i) {
-		string sex = (genderDist(gen) == 0) ? "male" : "female";
+		if (!specialCase) {
+			string sex = (genderDist(gen) == 0) ? "male" : "female";
+		}
+		else {
+			string sex = "male";
+		}
 		char firstLetter = 'A' + letterDist(gen);
 		string lastName = (specialCase) ? "F" + string(1, 'A' + letterDist(gen)) + "lastname" : string(1, firstLetter) + "lastname";
 		string firstName = "Firstname";
@@ -84,5 +88,31 @@ vector<Employee> Employee::generateEmployees(size_t count, bool specialCase) {
 		employees.emplace_back(lastName + " " + firstName, birthDate, sex);
 	}
 
+	return employees;
+}
+
+vector<Employee> Employee::pick(sqlite3* db, string sql) {
+	vector<Employee> employees;
+	sqlite3_stmt* stmt;
+
+	if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+		cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+		return employees;
+	}
+
+	while (sqlite3_step(stmt) == SQLITE_ROW) {
+		const char* fullName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+		const char* birthDate = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+		const char* sex = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+
+		if (fullName && birthDate && sex) {
+			employees.emplace_back(fullName, birthDate, sex);
+		}
+		else {
+			cerr << "Error: One or more columns contain NULL values!" << endl;
+		}
+	}
+
+	sqlite3_finalize(stmt);
 	return employees;
 }

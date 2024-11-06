@@ -19,4 +19,5 @@ public:
 	void insert(sqlite3* db);
 	void insertMultiple(sqlite3* db, vector<Employee> employees);
 	vector<Employee> generateEmployees(size_t count, bool specialCase = false);
+	vector<Employee> pick(sqlite3* db, string sql);
 };

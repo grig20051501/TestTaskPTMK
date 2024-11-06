@@ -4,6 +4,17 @@
 #include <vector>
 #include <random>
 
+//R"(
+//        SELECT e.name, e.birthDate, e.sex
+//        FROM Employees e
+//        GROUP BY e.name, e.birthDate
+//        ORDER BY e.name;
+//    )"
+
+//"SELECT*"
+//"FROM Employees"
+//"WHERE gender = 'Male' AND name LIKE 'F%';"
+
 using namespace std;
 
 static void createTable(sqlite3* db) {
@@ -21,40 +32,10 @@ static void createTable(sqlite3* db) {
 	}
 }
 
-vector<Employee> readAllEmployees(sqlite3* db) {
-    vector<Employee> employees;
-    string sql = R"(
-        SELECT e.name, e.birthDate, e.sex
-        FROM Employees e
-        GROUP BY e.name, e.birthDate
-        ORDER BY e.name;
-    )";
-    sqlite3_stmt* stmt;
-
-    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-        cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
-        return employees;
-    }
-
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        const char* fullName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
-        const char* birthDate = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
-        const char* gender = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
-
-        if (fullName && birthDate && gender) {
-            employees.emplace_back(fullName, birthDate, gender);
-        }
-        else {
-            cerr << "Error: One or more columns contain NULL values!" << endl;
-        }
-    }
-
-    sqlite3_finalize(stmt);
-    return employees;
-}
-
 int main() {
 	sqlite3* db;
+	string sql = "SELECT name, birthDate, sex FROM Employees WHERE sex = 'male' AND name LIKE 'F%';";
+
 	Employee a1("Smt", "2000-01-14", "male");
 	
 	bool rc = sqlite3_open("DataBase.db", &db);
@@ -63,16 +44,16 @@ int main() {
 		sqlite3_close(db);
 		return 1;
 	}
-	vector<Employee> employessGenerated = a1.generateEmployees(990000);
-	vector<Employee> speciaEmployees = a1.generateEmployees(100, true);
-	vector<Employee> employees = readAllEmployees(db);
 
-	a1.insertMultiple(db, employessGenerated);
-	a1.insertMultiple(db, speciaEmployees);
+	/*vector<Employee> employessGenerated = a1.generateEmployees(990000);
+	vector<Employee> speciaEmployees = a1.generateEmployees(100, true);*/
+	vector<Employee> employees = a1.pick(db, sql);
+	for (auto i : employees) {
+		i.printInfo();
+	}
 
-	/*for (auto employee : employees) {
-		employee.printInfo();
-	}*/
+	/*a1.insertMultiple(db, employessGenerated);
+	a1.insertMultiple(db, speciaEmployees);*/
 
 	sqlite3_close(db);
 
